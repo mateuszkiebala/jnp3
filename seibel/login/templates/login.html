@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load staticfiles %}
+    <link rel="stylesheet" type="text/css" href="{% static 'exp/style.css' %}" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+
+    <title>Seibel 1023 alternatives experiment</title>
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
+    <!-- jQuery library -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+
+    <!-- Latest compiled JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+</head>
+<body>
+    <div class="container">
+        <div class="card card-container">
+            {% block content %}
+                {% if form.errors %}
+                    <p class="error"> Sorry, that's not a valid username or password</p>
+                {% endif %}
+                <form action="/accounts/auth/" method="post" class="form-signin">{% csrf_token %}
+                    <span id="reauth-user" class="reauth-user"></span>
+                    <input type="text" id="inputUsername" class="form-control" placeholder="Username" name="username" required autofocus>
+                    <input type="password" id="inputPassword" class="form-control" placeholder="Password" name="password" required>
+                    <button class="btn btn-lg btn-primary btn-block btn-signin" type="submit">Sign in</button>
+                </form>
+                <p>new user? <a href="/accounts/register/" class="create-new-account">
+                    create new account
+                </a></p>
+            {% endblock %}
+        </div>
+    </div>
+</body>
+</html>
