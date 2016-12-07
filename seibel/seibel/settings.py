@@ -39,6 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'exp',
     'login',
+    'exp.training',
+    'exp.play',
 ]
 
 MIDDLEWARE_CLASSES = [
