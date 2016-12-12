@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, render_to_response
 
 
 def play(request):
@@ -6,11 +6,26 @@ def play(request):
 
 
 def feedback(request):
-    return render(request, 'feedback.html')
+    return render(request, 'play_feedback.html')
 
 
 def nonFeedback(request):
-    return render(request, 'non_feedback.html')
+    return render(request, 'play_non_feedback.html')
+
+
+def timeLimited(request, feedback_type):
+    return render(request, 'game.html',
+                  {'game_type': 'play',
+                   'feedback_type': feedback_type,
+                   'time_type': 'time_limited'}
+                  )
+
+
+def timeless(request, feedback_type):
+    return render(request, 'game.html',
+                  {'game_type': 'play',
+                   'feedback_type': feedback_type,
+                   'time_type': 'timeless'})
 
 
 def game(request):

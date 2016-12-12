@@ -1,6 +1,6 @@
 .bulbs {
     max-width: 350px;
-    padding-top: 50px;
+    padding-bottom: 30px;
 }
 
 .btn {
@@ -15,12 +15,8 @@
 }
 
 .center {
-    width: 500px;
-    margin: 0;
-    position: absolute;
-    top: 65%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+    width: 40%;
+    margin: 0 auto;
 }
 
 body {
@@ -36,10 +32,10 @@ body {
 }
 
 h1{
-  color: #396;
-  font-weight: 100;
-  font-size: 40px;
-  margin: 40px 0px 20px;
+    color: #396;
+    font-weight: 100;
+    font-size: 40px;
+    margin: 40px 0px 20px;
 }
 
 #clockdiv{
@@ -48,7 +44,7 @@ h1{
     display: inline-block;
     font-weight: 100;
     text-align: center;
-    font-size: 30px;
+    font-size: 20px;
 }
 
 #clockdiv > div{
