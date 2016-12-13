@@ -23,6 +23,29 @@
     <script type="text/javascript" src="/static/exp/game.js"></script>
 </head>
 <body>
+    <div class="container">
+        <!-- Modal -->
+        <div class="modal fade" id="myModal" role="dialog">
+            <div class="modal-dialog">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" onclick="modalCloseBtn()">&times;</button>
+                    <h4 id="modal-header-title" class="modal-title"></h4>
+                </div>
+            <div class="modal-body">
+                <input type="number" id="user_time" placeholder="time in miliseconds" value=0>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal" onclick="modalCloseBtn()">Close</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
     <div class="jumbotron text-center">
         <h1>1023 alternatives!</h1>
     </div>
@@ -77,25 +100,26 @@
     <h3>Time</h3>
     <div id="clockdiv">
         <div>
-            <span class="minutes"></span>
-            <div class="smalltext">Minutes</div>
-        </div>
-        <div>
             <span class="seconds"></span>
             <div class="smalltext">Seconds</div>
+        </div>
+        <div>
+            <span class="miliseconds"></span>
+            <div class="smalltext">Milisecs</div>
         </div>
     </div>
 
     <br><br>
     <div class="progress center">
-        <div id="progress_bar" class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="0"
-                aria-valuemin="0" aria-valuemax="1023" style="width:%">
+        <div id="progress_bar" class="progress-bar progress-bar-striped active" role="progressbar"
+                style="width:0%">
             <span><strong>Progress</strong></span>
         </div>
     </div>
 
     <script>
         $(document).ready (function() {
+
             {% if feedback_type == 'feedback' %}
                 feedback_type = 'feedback';
             {% endif %}
@@ -112,11 +136,7 @@
                 time_type = 'time_limited';
             {% endif %}
 
-            checkKey();
-            createConfigurations();
-            manageConfigurations();
-            manageTime();
-
+            showModal();
         });
 
     </script>

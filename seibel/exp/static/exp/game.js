@@ -1,86 +1,71 @@
 // TIMER //
 var time_type = 'time_limited';
-var timeintervalCountdown = null;
 var timeintervalTimer = null;
+var userTime = 0;
 
-function startCountdown() {
-    var deadline = new Date(Date.parse(new Date()) + 1 * 30 * 1000);
-    initializeClock('clockdiv', deadline);
-
-    function getTimeRemaining(endtime) {
-        var t = Date.parse(endtime) - Date.parse(new Date());
-        var seconds = Math.floor((t / 1000) % 60);
-        var minutes = Math.floor((t / 1000 / 60) % 60);
-        return {
-            'total': t,
-            'minutes': minutes,
-            'seconds': seconds
-        };
-    }
-
-    function initializeClock(id, endtime) {
-        var clock = document.getElementById(id);
-        var minutesSpan = clock.querySelector('.minutes');
-        var secondsSpan = clock.querySelector('.seconds');
-
-        function updateClock() {
-            var t = getTimeRemaining(endtime);
-            minutesSpan.innerHTML = ('0' + t.minutes).slice(-2);
-            secondsSpan.innerHTML = ('0' + t.seconds).slice(-2);
-
-            if (t.total <= 0) {
-              clearInterval(timeintervalCountdown);
-            }
-        }
-
-        updateClock();
-        timeintervalCountdown = setInterval(updateClock, 1000);
-    }
-}
-
-function startTimer() {
-    var starttime = new Date();
+function startTimer(countdownFlag) {
+    clearInterval(timeintervalTimer);
+    var starttime = setUpTimeForTimer(countdownFlag);
     initializeClock('clockdiv', starttime);
-
-    function getTimeRemaining(starttime) {
-        var t = Date.parse(new Date()) - Date.parse(starttime);
-        var seconds = Math.floor((t / 1000) % 60);
-        var minutes = Math.floor((t / 1000 / 60) % 60);
-        return {
-            'total': t,
-            'minutes': minutes,
-            'seconds': seconds
-        };
-    }
 
     function initializeClock(id, starttime) {
         var clock = document.getElementById(id);
-        var minutesSpan = clock.querySelector('.minutes');
+        var milisecsSpan = clock.querySelector('.miliseconds');
         var secondsSpan = clock.querySelector('.seconds');
 
         function updateClock() {
-            var t = getTimeRemaining(starttime);
-            minutesSpan.innerHTML = ('0' + t.minutes).slice(-2);
+            var t = getTimeRemaining(starttime, countdownFlag);
+            milisecsSpan.innerHTML = ('0' + t.miliseconds).slice(-2);
             secondsSpan.innerHTML = ('0' + t.seconds).slice(-2);
 
             if (t.total <= 0) {
-                clearInterval(timeintervalTimer);
+                milisecsSpan.innerHTML = '00';
+                secondsSpan.innerHTML = '00';
+                stopTimer(countdownFlag);
             }
         }
 
-        updateClock();
-        timeintervalTimer = setInterval(updateClock, 1000);
+        timeintervalTimer = setInterval(updateClock, 10);
     }
 }
 
-function manageTime() {
-    if (time_type == 'time_limited') {
-        clearInterval(timeintervalCountdown);
-        startCountdown();
-    } else if (time_type == 'timeless') {
-        clearInterval(timeintervalTimer);
-        startTimer();
+function setUpTimeForTimer(countdownFlag) {
+    var time = new Date();
+    if (time_type == 'time_limited' || countdownFlag == true) {
+        time = new Date(Date.parse(new Date()) + userTime);
     }
+    return time;
+}
+
+function getTimeRemaining(time, countdownFlag) {
+    var t = 0;
+    if (time_type == 'time_limited' || countdownFlag == true) {
+        t = time.getTime() - new Date().getTime();
+    } else if (time_type == 'timeless') {
+        t = new Date().getTime() - time.getTime();
+    }
+    return getTimeDifference(t);
+}
+
+function getTimeDifference(t) {
+    var miliseconds = Math.floor((t / 10));
+    var seconds = Math.floor((t / 1000) % 60);
+    return {
+        'total': t,
+        'seconds': seconds,
+        'miliseconds': miliseconds
+    };
+}
+
+function stopTimer(countdownFlag) {
+    clearInterval(timeintervalTimer);
+    if (time_type == 'time_limited' || countdownFlag == true) {
+        manageConfigurations();
+        startTimer(false);
+    }
+}
+
+function saveTime() {
 }
 
 // BULBS //
@@ -90,6 +75,7 @@ var curConfsIndex = 0;
 var confsNumber = 1023;
 var confs = new Array(confsNumber);
 var feedback_type = 'feedback';
+var configurationSucceeded = false;
 
 function checkKey() {
     document.onkeydown = function (e) {
@@ -100,8 +86,13 @@ function checkKey() {
                 bulb.src = "/static/exp/bulb-off.png";
                 --bulbsOnCnt;
                 if (bulbsOnCnt == 0) {
-                    manageTime();
-                    manageConfigurations();
+                    configurationSucceeded = true;
+                    if (curConfsIndex < confsNumber) {
+                        saveTime();
+                        if (time_type == 'timeless') {
+                            startTimer(true);
+                        }
+                    }
                 }
             } else if (bulb.src.split("/").slice(-1) == "bulb-off.png"
                         && feedback_type == 'feedback') {
@@ -129,9 +120,12 @@ function createConfigurations() {
 }
 
 function manageConfigurations() {
-    updateProgressBar();
-    displayConfiguration(confs[curConfsIndex]);
-    ++curConfsIndex;
+    if (curConfsIndex < confsNumber) {
+        updateProgressBar();
+        clearBulbs();
+        displayConfiguration(confs[curConfsIndex]);
+        ++curConfsIndex;
+    }
 }
 
 function displayConfiguration(conf) {
@@ -149,3 +143,37 @@ function updateProgressBar() {
     document.getElementById('progress_bar').style.width = ((curConfsIndex / confsNumber) * 100).toString() + '%';
 }
 
+function clearBulbs() {
+    for (var i = 0; i < 10; ++i) {
+         document.getElementById('bulb' + i).src = "/static/exp/bulb-off.png";
+    }
+}
+
+// MODAL //
+function showModal() {
+    var modalHeader = document.getElementById('modal-header-title');
+    if (time_type == 'timeless') {
+        modalHeader.innerHTML = 'Set some additional time for each configuration';
+    } else if (time_type == 'time_limited') {
+        modalHeader.innerHTML = 'Set time for each configuration';
+    }
+    $('#myModal').modal('show');
+}
+
+function modalCloseBtn() {
+    userTime = parseInt(document.getElementById('user_time').value);
+    var interval = setInterval(function() {
+        createConfigurations();
+        checkKey();
+        manageConfigurations();
+        startTimer(false);
+        clearInterval(interval);
+    }, 500);
+}
+
+// When the user clicks anywhere outside of the modal, close it.
+window.onclick = function(event) {
+    if (event.target == document.getElementById('myModal')) {
+        modalCloseBtn();
+    }
+};
