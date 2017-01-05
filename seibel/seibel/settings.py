@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'login',
     'exp.training',
     'exp.play',
+    'mathfilters',
 ]
 
 MIDDLEWARE_CLASSES = [

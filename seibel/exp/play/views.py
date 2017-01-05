@@ -7,32 +7,39 @@ from django.http import HttpResponse
 
 
 def play(request):
-    user_settings = UserSettings.objects.get(user=request.user)
-    latest_session_set = UserSessions.objects.filter(user=request.user,
-                                                     feedback_type=user_settings.feedback_type,
-                                                     timer_type=user_settings.timer_type)
+    user_settings_set = UserSettings.objects.filter(user=request.user)
+    if user_settings_set.__len__() > 0:
+        user_settings = user_settings_set[0]
+        latest_session_set = UserSessions.objects.filter(user=request.user,
+                                                         feedback_type=user_settings.feedback_type,
+                                                         timer_type=user_settings.timer_type)
+        if latest_session_set.__len__() > 0:
+            user_session = latest_session_set[0]
+            latest_session_no = latest_session_set[0].session_number
+        else:
+            latest_session_no = 0
+            user_session = UserSessions(user=request.user,
+                                        feedback_type=user_settings.feedback_type,
+                                        timer_type=user_settings.timer_type,
+                                        training_done='No',
+                                        session_number=0)
+            user_session.save()
 
-    if latest_session_set.__len__() > 0:
-        latest_session = latest_session_set[0].session_number
+        confs_done = [r.configuration for r in UserResult.objects.filter(user=request.user,
+                                                                          session_number=latest_session_no,
+                                                                          feedback_type=user_settings.feedback_type,
+                                                                          timer_type=user_settings.timer_type)]
+        return render(request, 'game.html',
+                        {'game_type': 'Normal',
+                         'session_limit': user_settings.session_limit,
+                         'feedback_type': user_settings.feedback_type,
+                         'timer_type': user_settings.timer_type,
+                         'time_gap': user_settings.time_gap,
+                         'session_number': latest_session_no,
+                         'training_done': user_session.training_done,
+                         'confs_done': confs_done })
     else:
-        latest_session = 0
-        UserSessions(user=request.user,
-                     feedback_type=user_settings.feedback_type,
-                     timer_type=user_settings.timer_type,
-                     session_number=0).save()
-
-    confs_done =  [r.configuration for r in UserResult.objects.filter(user=request.user,
-                                                                      session_number=latest_session,
-                                                                      feedback_type=user_settings.feedback_type,
-                                                                      timer_type=user_settings.timer_type)]
-    return render(request, 'game.html',
-                    {'game_type': 'Normal',
-                     'session_limit': user_settings.session_limit,
-                     'feedback_type': user_settings.feedback_type,
-                     'timer_type': user_settings.timer_type,
-                     'time_gap': user_settings.time_gap,
-                     'session_number': latest_session,
-                     'confs_done': confs_done })
+        return render(request, 'no_settings.html')
 
 
 @csrf_protect

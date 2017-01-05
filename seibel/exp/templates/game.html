@@ -5,6 +5,7 @@
     <title>Game</title>
 
     {% load staticfiles %}
+    {% load mathfilters %}
     <link rel="stylesheet" type="text/css" href="{% static 'exp/game_style.css' %}" />
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
 
@@ -32,11 +33,29 @@
             <!-- Modal content-->
             <div class="modal-content">
                 <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" onclick="modalCloseBtn()">&times;</button>
+                    <button type="button" class="close" data-dismiss="modal" onclick="modalCloseBtn()"></button>
                     <h4 id="modal-header-title" class="modal-title"></h4>
                 </div>
             <div class="modal-body">
                 <h5>Gdy zapali się żarówka, naciśnij odpowiadający jej klawisz na klawiaturze.</h5>
+                {% if feedback_type == 'Feedback' %}
+                    <h5>Gdy naciśniesz nieprawidłowy przycisk, usłyszysz sygnał dźwiękowy.</h5>
+                {% endif %}
+
+                {% if feedback_type == 'Non_feedback' %}
+                    <h5>Gdy naciśniesz nieprawidłowy przycisk, <strong>nie</strong> zostaniesz o tym powiadomiony.</h5>
+                {% endif %}
+
+                {% if timer_type == 'Timeless' %}
+                    <h5>Po naciśnięciu prawidłowego przycisku, żarówka zgaśnie.</h5>
+                    <h5>Masz nieograniczoną ilość czasu na wykonanie konfiguracji.</h5>
+                {% endif %}
+
+
+                {% if timer_type == 'Time_limited' %}
+                    <h5>Masz <strong>{{ time_gap|intdiv:1000 }}s {{ time_gap|mod:1000 }}ms </strong>na wykonanie konfiguracji.</h5>
+                {% endif %}
+
                 <h5>Po naciśnięciu przycisku "Close" masz 5 sekund zanim zaczniesz eksperyment.</h5>
             </div>
             <div class="modal-footer">
@@ -56,7 +75,7 @@
             <!-- Modal content-->
             <div class="modal-content">
                 <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" onclick="endModalCloseBtn()">&times;</button>
+                    <button type="button" class="close" data-dismiss="modal" onclick="endModalCloseBtn()"></button>
                     <h4 id="endmodal-header-title" class="modal-title"></h4>
                 </div>
             <div class="modal-body">
@@ -64,7 +83,13 @@
             </div>
             <div class="modal-footer">
                 <a href="/accounts/loggedin/" class="btn btn-default">Zakończ eksperyment.</a>
-                <a href="/exp/play/" class="btn btn-default">Rozpocznij kolejną sesję.</a>
+                {% if game_type == 'Normal' %}
+                    <a href="/exp/play/" class="btn btn-default">Rozpocznij kolejną sesję.</a>
+                {% endif %}
+
+                {% if game_type == 'Training' %}
+                    <a href="/exp/training/" class="btn btn-default">Rozpocznij kolejną sesję treningową.</a>
+                {% endif %}
             </div>
           </div>
         </div>
@@ -80,14 +105,37 @@
             <!-- Modal content-->
             <div class="modal-content">
                 <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" onclick="endModalCloseBtn()">&times;</button>
+                    <button type="button" class="close" data-dismiss="modal" onclick="endModalCloseBtn()"></button>
                     <h4 id="session_endmodal-header-title" class="modal-title"></h4>
                 </div>
             <div class="modal-body">
-                <h5>Gratulacje! Zakończyłeś już wszystkie sesje eksperymentalne.</h5>
+                <h5>Gratulacje! Wykonałeś już wszystkie sesje eksperymentalne.</h5>
             </div>
             <div class="modal-footer">
                 <a href="/accounts/loggedin/" class="btn btn-default">Przejdź do menu</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="container">
+        <!-- Trening Modal -->
+        <div class="modal fade" id="trainingModal" role="dialog">
+            <div class="modal-dialog">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" onclick="goToTraining()"></button>
+                    <h4 id="training-modal-header-title" class="modal-title">Witaj w sesji normalnej!</h4>
+                </div>
+                <div class="modal-body">
+                    <h5>Musisz odbyć trening, aby kontynuować.</h5>
+                </div>
+            <div class="modal-footer">
+                <a href="/exp/training/" class="btn btn-default">Przejdź do treningu</a>
             </div>
           </div>
         </div>
@@ -119,11 +167,11 @@
         </div>
         <div class="col-sm-1 bulbs">
             <img id="bulb5" class="img-responsive img-circle" src="/static/exp/bulb-off.png" width="100%">
-            <button id="bulb_btn5" type="button" class="btn btn-success">5</button>
+            <button id="bulb_btn5" type="button" class="btn btn-success">F</button>
         </div>
         <div class="col-sm-1 bulbs">
             <img id="bulb6" class="img-responsive img-circle" src="/static/exp/bulb-off.png" width="100%">
-            <button id="bulb_btn6" type="button" class="btn btn-success">6</button>
+            <button id="bulb_btn6" type="button" class="btn btn-success">H</button>
         </div>
         <div class="col-sm-1 bulbs">
             <img id="bulb7" class="img-responsive img-circle" src="/static/exp/bulb-off.png" width="100%">
@@ -185,33 +233,41 @@
                 timeType = 'Time_limited';
             {% endif %}
 
+            timeGap = {{ time_gap }};
+
             {% if game_type == 'Normal' %}
                 gameType = 'Normal';
+                sessionLimit = {{ session_limit }} - 1;
+                confsDoneInPrevSession = {{ confs_done | safe }};
+                sessionNumber = {{ session_number }};
+
+                {% if training_done == 'Yes' %}
+                    if (sessionLimit >= sessionNumber) {
+                        if (confsDoneInPrevSession.length >= confsNumber) {
+                            confsDoneInPrevSession = [];
+                            sendSessionUpdate(prepareSessionData());
+                            ++sessionNumber;
+                            showInstructionsModal();
+                        } else if (confsDoneInPrevSession.length != 0) {
+                            showContinuationModel();
+                        } else {
+                            showInstructionsModal();
+                        }
+                    } else {
+                        showEndingModal();
+                    }
+                {% endif %}
+
+                {% if training_done == 'No' %}
+                    $('#trainingModal').modal('show');
+                {% endif %}
             {% endif %}
 
             {% if game_type == 'Training' %}
                 gameType = 'Training';
+                sendTrainingUpdate();
+                showInstructionsModal();
             {% endif %}
-
-            timeGap = {{ time_gap }};
-            sessionLimit = {{ session_limit }} - 1;
-            confsDoneInPrevSession = {{ confs_done | safe }};
-            sessionNumber = {{ session_number }};
-
-            if (sessionLimit >= sessionNumber) {
-                if (confsDoneInPrevSession.length > 5) {
-                    confsDoneInPrevSession = [];
-                    sendSessionUpdate(prepareSessionData());
-                    ++sessionNumber;
-                    showInstructionsModal();
-                } else if (confsDoneInPrevSession.length != 0) {
-                    showContinuationModel();
-                } else {
-                    showInstructionsModal();
-                }
-            } else {
-                showEndingModal();
-            }
         });
 
     </script>

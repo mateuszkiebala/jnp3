@@ -68,13 +68,14 @@ function stopTimer(countdownFlag) {
     if (!confsDone[confs[curConfsIndex]]) {
         confsDone[confs[curConfsIndex]] = true;
         endTime = endTime == 0 ? startTime : endTime;
-        sendConfigurationResult(prepareDataToSend());
+        if (gameType == 'Normal') {
+            sendConfigurationResult(prepareDataToSend());
+        }
     }
 
     clearInterval(timeintervalTimer);
     if (timeType == 'Time_limited' || countdownFlag == true) {
         manageConfigurations();
-        startTimer(false);
     }
 }
 
@@ -93,8 +94,17 @@ var confsDoneInPrevSession = [];
 
 function checkKey() {
     document.onkeydown = function (e) {
-        if (e.keyCode >= 48 && e.keyCode <= 57) {
+        if ((e.keyCode >= 48 && e.keyCode <= 57) ||
+             e.keyCode == 102 || e.keyCode == 70 ||
+             e.keyCode == 104 || e.keyCode == 72) {
             var keyId = e.keyCode - 48;
+            // 5 == F && 6 == H
+            if (e.keyCode == 102 || e.keyCode == 70) {
+                keyId = 5;
+            } else if (e.keyCode == 104 || e.keyCode == 72) {
+                keyId = 6;
+            }
+
             var bulbId = 'bulb' + keyId.toString();
             var bulb = document.getElementById(bulbId);
 
@@ -165,6 +175,7 @@ function manageConfigurations() {
         clearBulbs();
         displayConfiguration(confs[curConfsIndex]);
         ++curConfsIndex;
+        startTimer(false);
     } else {
         showEndingModal();
     }
@@ -186,6 +197,7 @@ function updateProgressBar() {
 }
 
 function clearBulbs() {
+    bulbsOnCnt = 0;
     for (var i = 0; i < 10; ++i) {
          document.getElementById('bulb' + i).src = "/static/exp/bulb-off.png";
     }
@@ -269,8 +281,6 @@ function sendConfigurationResult(data) {
     var xhr = new XMLHttpRequest();
     xhr.open('POST', '/exp/play/update_results/', true);
     xhr.setRequestHeader("Content-type", "application/json; charset=utf-8");
-    xhr.setRequestHeader("Content-length", data.length);
-    xhr.setRequestHeader("Connection", "close");
     if (!csrfSafeMethod('POST') && !this.crossDomain) {
         xhr.setRequestHeader("X-CSRFToken", csrftoken);
     }
@@ -289,8 +299,28 @@ function sendSessionUpdate(data) {
     var xhr = new XMLHttpRequest();
     xhr.open('POST', '/exp/play/update_session/', true);
     xhr.setRequestHeader("Content-type", "application/json; charset=utf-8");
-    xhr.setRequestHeader("Content-length", data.length);
-    xhr.setRequestHeader("Connection", "close");
+    if (!csrfSafeMethod('POST') && !this.crossDomain) {
+        xhr.setRequestHeader("X-CSRFToken", csrftoken);
+    }
+
+    xhr.onreadystatechange = function() {
+        if (xhr.readyState == 4 && xhr.status != 200) {
+            alert("Error " + xhr.status + "\n" + xhr.responseText);
+        }
+    };
+    xhr.send(data);
+}
+
+function sendTrainingUpdate() {
+    var data = new Object();
+    data['feedback_type'] = feedbackType;
+    data['timer_type'] = timeType;
+    data = JSON.stringify(data);
+
+    var csrftoken = Cookies.get('csrftoken');
+    var xhr = new XMLHttpRequest();
+    xhr.open('POST', '/exp/training/update_training/', true);
+    xhr.setRequestHeader("Content-type", "application/json; charset=utf-8");
     if (!csrfSafeMethod('POST') && !this.crossDomain) {
         xhr.setRequestHeader("X-CSRFToken", csrftoken);
     }
@@ -346,6 +376,10 @@ function endModalCloseBtn() {
     window.location.href = "/accounts/loggedin/";
 }
 
+function goToTraining() {
+    window.location.href = "/exp/training/";
+}
+
 // When the user clicks anywhere outside of the modal, close it.
 window.onclick = function(event) {
     if (event.target == document.getElementById('myModal')) {
@@ -364,3 +398,9 @@ window.onclick = function(event) {
         endModalCloseBtn();
     }
 };
+
+window.onclick = function(event) {
+    if (event.target == document.getElementById('trainingModal')) {
+        goToTraining();
+    }
+}

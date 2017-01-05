@@ -69,3 +69,11 @@ h1{
 #user_time {
     font-weight: bold;
 }
+
+.modal-header {
+    background-color: bisque;
+}
+
+.modal-body, .modal-footer {
+    background-color: beige;
+}

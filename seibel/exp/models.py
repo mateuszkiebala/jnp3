@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 from django.contrib.auth.models import User
 from django.db import models
 from django.core.exceptions import ValidationError
+from django.core.validators import MinValueValidator
 
 # Create your models here.
 
@@ -21,12 +22,15 @@ class UserSettings(models.Model):
         ('Time_limited', 'Time_limited'),
     )
     timer_type = models.CharField(default=TIMER_CHOICES[0], max_length=100, choices=TIMER_CHOICES)
-
-    time_gap = models.IntegerField(default=1000)
+    time_gap = models.PositiveIntegerField(default=5000, validators=[MinValueValidator(1000)])
 
     def clean(self):
         if self._state.adding and UserSettings.objects.filter(user=self.user).exists():
             raise ValidationError('Settings for this user already exists.')
+
+    def __iter__(self):
+        for attr, value in self.__dict__.iteritems():
+            yield attr, value
 
 
 class UserResult(models.Model):
@@ -79,3 +83,8 @@ class UserSessions(models.Model):
     session_number = models.IntegerField(default=0)
     feedback_type = models.CharField(default='Feedback', max_length=100)
     timer_type = models.CharField(default='Timeless', max_length=100)
+    training_done = models.CharField(default='No', max_length=10)
+
+    def __iter__(self):
+        for attr, value in self.__dict__.iteritems():
+            yield attr, value
