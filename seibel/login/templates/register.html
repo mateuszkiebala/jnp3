@@ -22,6 +22,8 @@
         <div class="card card-container">
             {% block content %}
                 <form method="post" action="/accounts/register/">{% csrf_token %}
+                    {{ form.as_p }}
+                    <!--
                     <div class="form-group">
                         <label class="control-label" for="username">Username</label>
                         <input id="signupName" type="text" maxlength="50" class="form-control" name="username">
@@ -35,6 +37,11 @@
                         <input id="signupPasswordagain" type="password" maxlength="25" class="form-control" name="password2">
                     </div>
                     <div class="form-group">
+                        <label class="control-label" for="gender">Gender</label>
+                        <select id="gender" type="gender" class="form-control" name="gender"></select>
+                    </div>
+                    !-->
+                    <div class="form-group">
                         <button id="signupSubmit" type="submit" class="btn btn-info btn-block">Create your account</button>
                     </div>
                 </form>
@@ -43,22 +50,6 @@
                     <a href="/accounts/login/" class="create-new-account">log in</a>
                 </p>
             {% endblock %}
-
-             {% if form.errors %}
-                {% for field in form %}
-                    {% for error in field.errors %}
-                        <div class="alert alert-danger">
-                            <strong>{{ error|escape }}</strong>
-                        </div>
-                    {% endfor %}
-                {% endfor %}
-                {% for error in form.non_field_errors %}
-                    <div class="alert alert-danger">
-                        <strong>{{ error|escape }}</strong>
-                    </div>
-                {% endfor %}
-             {% endif %}
-
         </div>
     </div>
 

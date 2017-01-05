@@ -16,16 +16,16 @@ def nonFeedback(request):
 def timeLimited(request, feedback_type):
     return render(request, 'game.html',
                   {'game_type': 'training',
-                   'feedback_type': feedback_type,
-                   'time_type': 'time_limited'}
+                   'feedbackType': feedback_type,
+                   'timeType': 'time_limited'}
                   )
 
 
 def timeless(request, feedback_type):
     return render(request, 'game.html',
                   {'game_type': 'training',
-                   'feedback_type': feedback_type,
-                   'time_type': 'timeless'})
+                   'feedbackType': feedback_type,
+                   'timeType': 'timeless'})
 
 
 def game(request):

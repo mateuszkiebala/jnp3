@@ -1,15 +1,17 @@
-import re
 from django import forms
 from django.contrib.auth.models import User
 from django.utils.translation import ugettext_lazy as _
+from django.contrib.auth.forms import UserCreationForm
 
 
-class RegistrationForm(forms.Form):
-    username = forms.RegexField(regex=r'^\w+$', widget=forms.TextInput(attrs=dict(required=True, max_length=30)),
-                                label=_("Username"), error_messages={
-            'invalid': _("This value must contain only letters, numbers and underscores.")})
-    password = forms.CharField(
-        widget=forms.PasswordInput(attrs=dict(required=True, max_length=30, render_value=False)), label=_("Password"))
+class RegistrationForm(UserCreationForm):
+    age = forms.IntegerField(required=True, min_value=0, max_value=150, label=_("Age"))
+
+    GENDER_CHOICES = (
+        ('M', 'Male'),
+        ('F', 'Female'),
+    )
+    gender = forms.ChoiceField(required=True, choices=GENDER_CHOICES)
 
 
 def clean_username(self):

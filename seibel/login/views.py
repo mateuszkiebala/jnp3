@@ -2,7 +2,9 @@ from django.shortcuts import render_to_response, render
 from django.http import HttpResponseRedirect
 from django.contrib import auth
 from django.template.context_processors import csrf
-from django.contrib.auth.forms import UserCreationForm
+from forms import RegistrationForm
+from models import UserProfile
+
 
 def home(request):
     return render(request, 'login.html')
@@ -21,9 +23,16 @@ def auth_view(request):
 
     if user is not None:
         auth.login(request, user)
-        return HttpResponseRedirect('/accounts/loggedin')
+        if user.is_active and user.is_superuser:
+            return HttpResponseRedirect('/accounts/admin_loggedin')
+        else:
+            return HttpResponseRedirect('/accounts/loggedin')
     else:
         return HttpResponseRedirect('/accounts/invalid')
+
+
+def admin_loggedin(request):
+    return HttpResponseRedirect('/admin/')
 
 
 def loggedin(request):
@@ -44,15 +53,19 @@ def register_user(request):
     args = {}
     args.update(csrf(request))
     if request.method == 'POST':
-        form = UserCreationForm(request.POST)
+        form = RegistrationForm(request.POST)
         if form.is_valid():
-            form.save()
+            user = form.save()
+            UserProfile(user=user,
+                        name=form.cleaned_data['username'],
+                        age=form.cleaned_data['age'],
+                        gender=form.cleaned_data['gender']).save()
             return HttpResponseRedirect('/accounts/register_success')
         else:
             args['form'] = form
             return render_to_response('register.html', args)
 
-    args['form'] = UserCreationForm()
+    args['form'] = RegistrationForm()
     return render_to_response('register.html', args)
 
 

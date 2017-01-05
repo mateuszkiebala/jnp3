@@ -20,6 +20,7 @@
     <!-- Latest compiled JavaScript -->
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 
+    <script type="text/javascript" src="/static/exp/cookie.js"></script>
     <script type="text/javascript" src="/static/exp/game.js"></script>
 </head>
 <body>
@@ -35,10 +36,35 @@
                     <h4 id="modal-header-title" class="modal-title"></h4>
                 </div>
             <div class="modal-body">
-                <input type="number" id="user_time" placeholder="time in miliseconds" value=0>
+                <h5>Gdy zapali się żarówka, naciśnij odpowiadający jej klawisz na klawiaturze.</h5>
+                <h5>Po naciśnięciu przycisku "Close" masz 5 sekund zanim zaczniesz eksperyment.</h5>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal" onclick="modalCloseBtn()">Close</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="container">
+        <!-- Modal -->
+        <div class="modal fade" id="myEndModal" role="dialog">
+            <div class="modal-dialog">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" onclick="endModalCloseBtn()">&times;</button>
+                    <h4 id="endmodal-header-title" class="modal-title"></h4>
+                </div>
+            <div class="modal-body">
+                <h5>Gratulacje!</h5>
+            </div>
+            <div class="modal-footer">
+                <a href="/accounts/loggedin/" class="btn btn-default">Zakończ eksperyment.</a>
+                <a href="/exp/play/" class="btn btn-default">Rozpocznij kolejną sesję.</a>
             </div>
           </div>
         </div>
@@ -120,23 +146,44 @@
     <script>
         $(document).ready (function() {
 
-            {% if feedback_type == 'feedback' %}
-                feedback_type = 'feedback';
+            {% if feedback_type == 'Feedback' %}
+                feedbackType = 'Feedback';
             {% endif %}
 
-            {% if feedback_type == 'non_feedback' %}
-                feedback_type = 'non_feedback';
+            {% if feedback_type == 'Non_feedback' %}
+                feedbackType = 'Non_feedback';
             {% endif %}
 
-            {% if time_type == 'timeless' %}
-                time_type = 'timeless';
+            {% if timer_type == 'Timeless' %}
+                timeType = 'Timeless';
             {% endif %}
 
-            {% if time_type == 'time_limited' %}
-                time_type = 'time_limited';
+            {% if timer_type == 'Time_limited' %}
+                timeType = 'Time_limited';
             {% endif %}
 
-            showModal();
+            {% if game_type == 'Normal' %}
+                gameType = 'Normal';
+            {% endif %}
+
+            {% if game_type == 'Training' %}
+                gameType = 'Training';
+            {% endif %}
+
+            timeGap = {{ time_gap }};
+            confsDoneInPrevSession = {{ confs_done | safe }};
+            sessionNumber = {{ session_number }};
+
+            if (confsDoneInPrevSession.length > 7) {
+                confsDoneInPrevSession = [];
+                sendSessionUpdate(prepareSessionData());
+                ++sessionNumber;
+                showInstructionsModal();
+            } else if (confsDoneInPrevSession.length != 0) {
+                showContinuationModel();
+            } else {
+                showInstructionsModal();
+            }
         });
 
     </script>
