@@ -25,7 +25,7 @@
 </head>
 <body>
     <div class="container">
-        <!-- Modal -->
+        <!-- Instructions Modal -->
         <div class="modal fade" id="myModal" role="dialog">
             <div class="modal-dialog">
 
@@ -49,7 +49,7 @@
     </div>
 
     <div class="container">
-        <!-- Modal -->
+        <!-- End Modal -->
         <div class="modal fade" id="myEndModal" role="dialog">
             <div class="modal-dialog">
 
@@ -65,6 +65,29 @@
             <div class="modal-footer">
                 <a href="/accounts/loggedin/" class="btn btn-default">Zakończ eksperyment.</a>
                 <a href="/exp/play/" class="btn btn-default">Rozpocznij kolejną sesję.</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="container">
+        <!-- Session limit Modal -->
+        <div class="modal fade" id="sessionEndModal" role="dialog">
+            <div class="modal-dialog">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" onclick="endModalCloseBtn()">&times;</button>
+                    <h4 id="session_endmodal-header-title" class="modal-title"></h4>
+                </div>
+            <div class="modal-body">
+                <h5>Gratulacje! Zakończyłeś już wszystkie sesje eksperymentalne.</h5>
+            </div>
+            <div class="modal-footer">
+                <a href="/accounts/loggedin/" class="btn btn-default">Przejdź do menu</a>
             </div>
           </div>
         </div>
@@ -171,18 +194,23 @@
             {% endif %}
 
             timeGap = {{ time_gap }};
+            sessionLimit = {{ session_limit }} - 1;
             confsDoneInPrevSession = {{ confs_done | safe }};
             sessionNumber = {{ session_number }};
 
-            if (confsDoneInPrevSession.length > 7) {
-                confsDoneInPrevSession = [];
-                sendSessionUpdate(prepareSessionData());
-                ++sessionNumber;
-                showInstructionsModal();
-            } else if (confsDoneInPrevSession.length != 0) {
-                showContinuationModel();
+            if (sessionLimit >= sessionNumber) {
+                if (confsDoneInPrevSession.length > 5) {
+                    confsDoneInPrevSession = [];
+                    sendSessionUpdate(prepareSessionData());
+                    ++sessionNumber;
+                    showInstructionsModal();
+                } else if (confsDoneInPrevSession.length != 0) {
+                    showContinuationModel();
+                } else {
+                    showInstructionsModal();
+                }
             } else {
-                showInstructionsModal();
+                showEndingModal();
             }
         });
 

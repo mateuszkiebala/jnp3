@@ -27,6 +27,7 @@ def play(request):
                                                                       timer_type=user_settings.timer_type)]
     return render(request, 'game.html',
                     {'game_type': 'Normal',
+                     'session_limit': user_settings.session_limit,
                      'feedback_type': user_settings.feedback_type,
                      'timer_type': user_settings.timer_type,
                      'time_gap': user_settings.time_gap,

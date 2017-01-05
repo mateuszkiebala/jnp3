@@ -118,7 +118,6 @@ function checkKey() {
                     } else {
                         showEndingModal();
                     }
-                    showEndingModal();
                 }
             } else if (bulb.src.split("/").slice(-1) == "bulb-off.png") {
                 if (feedbackType == 'Feedback') {
@@ -196,6 +195,7 @@ function clearBulbs() {
 // GAME //
 var gameType = '';
 var sessionNumber = 0;
+var sessionLimit = 0;
 
 function start() {
     var interval = setInterval(function() {
@@ -321,13 +321,21 @@ function showContinuationModel() {
 }
 
 function showEndingModal() {
-    var modalHeader = document.getElementById('endmodal-header-title');
+    var modalHeader = (sessionLimit <= sessionNumber) ?
+                        document.getElementById('session_endmodal-header-title') :
+                        document.getElementById('endmodal-header-title');
+
     if (gameType == 'Normal') {
         modalHeader.innerHTML = 'Zakończyłeś sesję eksperymentalną.';
     } else if (gameType == 'Training') {
         modalHeader.innerHTML = 'Zakończyłeś sesję treningową.';
     }
-    $('#myEndModal').modal('show');
+
+    if (sessionLimit <= sessionNumber) {
+        $('#sessionEndModal').modal('show');
+    } else {
+        $('#myEndModal').modal('show');
+    }
 }
 
 function modalCloseBtn() {
@@ -347,6 +355,12 @@ window.onclick = function(event) {
 
 window.onclick = function(event) {
     if (event.target == document.getElementById('myEndModal')) {
+        endModalCloseBtn();
+    }
+};
+
+window.onclick = function(event) {
+    if (event.target == document.getElementById('sessionEndModal')) {
         endModalCloseBtn();
     }
 };
