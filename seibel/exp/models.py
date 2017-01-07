@@ -39,8 +39,8 @@ class UserResult(models.Model):
     timer_type = models.CharField(max_length=100, default='Timeless')
     session_number = models.IntegerField(default=0)
     configuration = models.IntegerField(default=0)
-    start_time = models.CharField(max_length=100)
-    end_time = models.CharField(max_length=100)
+    start_time = models.CharField(default="-", max_length=100)
+    end_time = models.CharField(default="-", max_length=100)
     total_time = models.CharField(default="0s", max_length=100)
     errors_count = models.IntegerField(default=0)
     is_correct = models.CharField(max_length=10, default='Nie')
@@ -84,6 +84,20 @@ class UserSessions(models.Model):
     feedback_type = models.CharField(default='Feedback', max_length=100)
     timer_type = models.CharField(default='Timeless', max_length=100)
     training_done = models.CharField(default='No', max_length=10)
+
+    def __iter__(self):
+        for attr, value in self.__dict__.iteritems():
+            yield attr, value
+
+
+class UserSessionsInfo(models.Model):
+    user = models.ForeignKey(User)
+    session_number = models.IntegerField(default=0)
+    feedback_type = models.CharField(default='Feedback', max_length=100)
+    timer_type = models.CharField(default='Timeless', max_length=100)
+    start = models.DateTimeField(auto_now_add=True, blank=True)
+    end = models.DateTimeField(null=True, blank=True)
+    time = models.CharField(default="-", max_length=100)
 
     def __iter__(self):
         for attr, value in self.__dict__.iteritems():

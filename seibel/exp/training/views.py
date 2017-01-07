@@ -7,13 +7,17 @@ from django.http import HttpResponse
 
 
 def training(request):
-    user_settings = UserSettings.objects.get(user=request.user)
-    return render(request, 'game.html',
-                  {'game_type': 'Training',
-                   'feedback_type': user_settings.feedback_type,
-                   'timer_type': user_settings.timer_type,
-                   'time_gap': user_settings.time_gap
-                   })
+    settings_set = UserSettings.objects.filter(user=request.user)
+    if settings_set.__len__() > 0:
+        user_settings = settings_set[0]
+        return render(request, 'game.html',
+                      {'game_type': 'Training',
+                       'feedback_type': user_settings.feedback_type,
+                       'timer_type': user_settings.timer_type,
+                       'time_gap': user_settings.time_gap
+                       })
+    else:
+        return render(request, 'no_settings.html')
 
 
 @csrf_protect

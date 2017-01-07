@@ -56,7 +56,10 @@
                     <h5>Masz <strong>{{ time_gap|intdiv:1000 }}s {{ time_gap|mod:1000 }}ms </strong>na wykonanie konfiguracji.</h5>
                 {% endif %}
 
+                <h5>Wciśnij <strong>spację</strong>, aby przerwać eksperyment.</h5>
+                <br>
                 <h5>Po naciśnięciu przycisku "Close" masz 5 sekund zanim zaczniesz eksperyment.</h5>
+
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal" onclick="modalCloseBtn()">Close</button>
@@ -76,7 +79,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" onclick="endModalCloseBtn()"></button>
-                    <h4 id="endmodal-header-title" class="modal-title"></h4>
+                    <h4 id="session-endmodal-header-title" class="modal-title"></h4>
                 </div>
             <div class="modal-body">
                 <h5>Gratulacje!</h5>
@@ -106,7 +109,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" onclick="endModalCloseBtn()"></button>
-                    <h4 id="session_endmodal-header-title" class="modal-title"></h4>
+                    <h4 id="session_limit_endmodal-header-title" class="modal-title"></h4>
                 </div>
             <div class="modal-body">
                 <h5>Gratulacje! Wykonałeś już wszystkie sesje eksperymentalne.</h5>
@@ -214,6 +217,12 @@
         </div>
     </div>
 
+    {% if game_type == 'Training' %}
+        <form action="/accounts/loggedin">
+            <button class="btn btn-lg btn-primary btn-block btn-interface" type="submit">Zakończ trening</button>
+        </form>
+    {% endif %}
+
     <script>
         $(document).ready (function() {
 
@@ -237,7 +246,7 @@
 
             {% if game_type == 'Normal' %}
                 gameType = 'Normal';
-                sessionLimit = {{ session_limit }} - 1;
+                sessionLimit = {{ session_limit }};
                 confsDoneInPrevSession = {{ confs_done | safe }};
                 sessionNumber = {{ session_number }};
 
@@ -245,16 +254,17 @@
                     if (sessionLimit >= sessionNumber) {
                         if (confsDoneInPrevSession.length >= confsNumber) {
                             confsDoneInPrevSession = [];
-                            sendSessionUpdate(prepareSessionData());
-                            ++sessionNumber;
+                            newSession = true;
                             showInstructionsModal();
-                        } else if (confsDoneInPrevSession.length != 0) {
+                        } else if (confsDoneInPrevSession.length == 0 && sessionNumber == 0) {
+                            newSession = true;
+                            showInstructionsModal();
+                        } else { // case for the number zero session
+                            newSession = false;
                             showContinuationModel();
-                        } else {
-                            showInstructionsModal();
                         }
                     } else {
-                        showEndingModal();
+                        showSessionEndingModal();
                     }
                 {% endif %}
 

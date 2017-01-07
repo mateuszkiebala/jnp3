@@ -126,7 +126,7 @@ function checkKey() {
                             startTimer(true);
                         }
                     } else {
-                        showEndingModal();
+                        showSessionEndingModal();
                     }
                 }
             } else if (bulb.src.split("/").slice(-1) == "bulb-off.png") {
@@ -135,6 +135,8 @@ function checkKey() {
                 }
                 ++errorsCnt;
             }
+        } else if (e.keyCode == 32) { // space
+            endModalCloseBtn();
         }
     }
 }
@@ -177,7 +179,7 @@ function manageConfigurations() {
         ++curConfsIndex;
         startTimer(false);
     } else {
-        showEndingModal();
+        showSessionEndingModal();
     }
 }
 
@@ -208,6 +210,7 @@ function clearBulbs() {
 var gameType = '';
 var sessionNumber = 0;
 var sessionLimit = 0;
+var newSession = false;
 
 function start() {
     var interval = setInterval(function() {
@@ -253,14 +256,6 @@ function prepareButtonsResult(data) {
     data['fin_10'] = (typeof buttonClickTime[0] === 'undefined') ? "-" : buttonClickTime[0];
 }
 
-function prepareSessionData() {
-     var data = new Object();
-     data['feedback_type'] = feedbackType;
-     data['timer_type'] = timeType;
-     data['session_number'] = sessionNumber;
-     return JSON.stringify(data);
-}
-
 function clearConfigurationResults() {
     startTime = 0;
     endTime = 0;
@@ -277,49 +272,47 @@ function csrfSafeMethod(method) {
 }
 
 function sendConfigurationResult(data) {
-    var csrftoken = Cookies.get('csrftoken');
-    var xhr = new XMLHttpRequest();
-    xhr.open('POST', '/exp/play/update_results/', true);
-    xhr.setRequestHeader("Content-type", "application/json; charset=utf-8");
-    if (!csrfSafeMethod('POST') && !this.crossDomain) {
-        xhr.setRequestHeader("X-CSRFToken", csrftoken);
-    }
-
-    xhr.onreadystatechange = function() {
-        if (xhr.readyState == 4 && xhr.status != 200) {
-            alert("Error " + xhr.status + "\n" + xhr.responseText);
-        }
-    };
-    xhr.send(data);
+    sendUpdate(data, '/exp/play/update_results/');
     clearConfigurationResults();
 }
 
 function sendSessionUpdate(data) {
-    var csrftoken = Cookies.get('csrftoken');
-    var xhr = new XMLHttpRequest();
-    xhr.open('POST', '/exp/play/update_session/', true);
-    xhr.setRequestHeader("Content-type", "application/json; charset=utf-8");
-    if (!csrfSafeMethod('POST') && !this.crossDomain) {
-        xhr.setRequestHeader("X-CSRFToken", csrftoken);
-    }
-
-    xhr.onreadystatechange = function() {
-        if (xhr.readyState == 4 && xhr.status != 200) {
-            alert("Error " + xhr.status + "\n" + xhr.responseText);
-        }
-    };
-    xhr.send(data);
+    var data = new Object();
+    data['feedback_type'] = feedbackType;
+    data['timer_type'] = timeType;
+    data['session_number'] = sessionNumber;
+    sendUpdate(JSON.stringify(data), '/exp/play/update_session/');
 }
 
 function sendTrainingUpdate() {
     var data = new Object();
     data['feedback_type'] = feedbackType;
     data['timer_type'] = timeType;
-    data = JSON.stringify(data);
+    sendUpdate(JSON.stringify(data), '/exp/training/update_training/');
+}
 
+function sendSessionStartUpdate() {
+    var data = new Object();
+    data['feedback_type'] = feedbackType;
+    data['timer_type'] = timeType;
+    data['session_number'] = sessionNumber;
+    data['start'] = new Date();
+    sendUpdate(JSON.stringify(data), '/exp/play/update_session_start/');
+}
+
+function sendSessionEndUpdate() {
+    var data = new Object();
+    data['feedback_type'] = feedbackType;
+    data['timer_type'] = timeType;
+    data['session_number'] = sessionNumber;
+    data['end'] = new Date();
+    sendUpdate(JSON.stringify(data), '/exp/play/update_session_end/');
+}
+
+function sendUpdate(data, link) {
     var csrftoken = Cookies.get('csrftoken');
     var xhr = new XMLHttpRequest();
-    xhr.open('POST', '/exp/training/update_training/', true);
+    xhr.open('POST', link, true);
     xhr.setRequestHeader("Content-type", "application/json; charset=utf-8");
     if (!csrfSafeMethod('POST') && !this.crossDomain) {
         xhr.setRequestHeader("X-CSRFToken", csrftoken);
@@ -350,10 +343,11 @@ function showContinuationModel() {
     $('#myModal').modal('show');
 }
 
-function showEndingModal() {
-    var modalHeader = (sessionLimit <= sessionNumber) ?
-                        document.getElementById('session_endmodal-header-title') :
-                        document.getElementById('endmodal-header-title');
+function showSessionEndingModal() {
+    sendSessionEndUpdate(); // set session end time
+    var modalHeader = (sessionLimit < sessionNumber) ?
+                        document.getElementById('session_limit_endmodal-header-title') :
+                        document.getElementById('session-endmodal-header-title');
 
     if (gameType == 'Normal') {
         modalHeader.innerHTML = 'Zakończyłeś sesję eksperymentalną.';
@@ -361,7 +355,7 @@ function showEndingModal() {
         modalHeader.innerHTML = 'Zakończyłeś sesję treningową.';
     }
 
-    if (sessionLimit <= sessionNumber) {
+    if (sessionLimit < sessionNumber) {
         $('#sessionEndModal').modal('show');
     } else {
         $('#myEndModal').modal('show');
@@ -369,6 +363,12 @@ function showEndingModal() {
 }
 
 function modalCloseBtn() {
+    if (newSession) {
+        sendSessionUpdate(); // increase session number by one
+        ++sessionNumber;
+        sendSessionStartUpdate(); // set start time for new session
+        newSession = false;
+    }
     start();
 }
 
@@ -385,22 +385,16 @@ window.onclick = function(event) {
     if (event.target == document.getElementById('myModal')) {
         modalCloseBtn();
     }
-};
 
-window.onclick = function(event) {
+    if (event.target == document.getElementById('trainingModal')) {
+        goToTraining();
+    }
+
     if (event.target == document.getElementById('myEndModal')) {
         endModalCloseBtn();
     }
-};
 
-window.onclick = function(event) {
     if (event.target == document.getElementById('sessionEndModal')) {
         endModalCloseBtn();
     }
 };
-
-window.onclick = function(event) {
-    if (event.target == document.getElementById('trainingModal')) {
-        goToTraining();
-    }
-}

@@ -1,9 +1,10 @@
 from django.shortcuts import render, render_to_response
-from exp.models import UserSettings, UserResult, UserSessions
+from exp.models import UserSettings, UserResult, UserSessions, UserSessionsInfo
 from django.views.decorators.csrf import csrf_protect
 from django.contrib.auth.decorators import login_required
 from rest_framework.decorators import api_view
 from django.http import HttpResponse
+from datetime import datetime
 
 
 def play(request):
@@ -95,3 +96,47 @@ def update_session(request):
 
         return HttpResponse("Session updated.")
 
+
+@csrf_protect
+@login_required()
+@api_view(['POST', ])
+def update_session_start(request):
+    if request.method == 'POST':
+        json_data = request.data
+        UserSessionsInfo(user=request.user,
+                         feedback_type=json_data['feedback_type'],
+                         timer_type=json_data['timer_type'],
+                         session_number=json_data['session_number'],
+                         start=json_data['start']).save()
+        return HttpResponse("Session start updated")
+
+
+@csrf_protect
+@login_required()
+@api_view(['POST', ])
+def update_session_end(request):
+    if request.method == 'POST':
+        json_data = request.data
+        UserSessionsInfo.objects.filter(user=request.user,
+                                        feedback_type=json_data['feedback_type'],
+                                        timer_type=json_data['timer_type'],
+                                        session_number=json_data['session_number']
+                                        ).update(end=json_data['end'])
+
+        sessions = UserSessionsInfo.objects.filter(user=request.user,
+                                                feedback_type=json_data['feedback_type'],
+                                                timer_type=json_data['timer_type'],
+                                                session_number=json_data['session_number'])
+
+        if sessions.__len__() > 0:
+            start = sessions[0].start
+            end = sessions[0].end
+            time = end - start
+            UserSessionsInfo.objects.filter(user=request.user,
+                                            feedback_type=json_data['feedback_type'],
+                                            timer_type=json_data['timer_type'],
+                                            session_number=json_data['session_number']
+                                            ).update(time=time)
+            return HttpResponse("Session end updated")
+        else:
+            return HttpResponse("Session end update failed.")

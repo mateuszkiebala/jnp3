@@ -1,5 +1,5 @@
 from django.contrib import admin
-from models import UserSettings, UserResult, UserSessions
+from models import UserSettings, UserResult, UserSessions, UserSessionsInfo
 import csv
 
 # Register your models here.
@@ -21,6 +21,19 @@ class UserSettingsAdmin(admin.ModelAdmin):
     def _export_to_csv(self, request, queryset):
         export_to_csv(self, request, queryset, 'settings.csv')
     _export_to_csv.short_description = "Export settings to CSV file."
+
+
+class UserSessionsInfoAdmin(admin.ModelAdmin):
+    list_display = ('user', 'session_number', 'feedback_type', 'timer_type', 'start', 'end', 'time')
+    actions = ['_export_to_csv']
+    list_filter = ['user']
+
+    def has_add_permission(self, request):
+        return False
+
+    def _export_to_csv(self, request, queryset):
+        export_to_csv(self, request, queryset, 'sessions_info.csv')
+    _export_to_csv.short_description = "Export sessions info to CSV file."
 
 
 class UserResultAdmin(admin.ModelAdmin):
@@ -48,7 +61,11 @@ class UserSessionAdmin(admin.ModelAdmin):
         export_to_csv(self, request, queryset, 'sessions.csv')
     _export_to_csv.short_description = "Export sessions to CSV file."
 
+    def has_add_permission(self, request):
+        return False
 
+
+admin.site.register(UserSessionsInfo, UserSessionsInfoAdmin)
 admin.site.register(UserSessions, UserSessionAdmin)
 admin.site.register(UserResult, UserResultAdmin)
 admin.site.register(UserSettings, UserSettingsAdmin)
