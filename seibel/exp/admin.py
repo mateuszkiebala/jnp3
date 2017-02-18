@@ -1,5 +1,5 @@
 from django.contrib import admin
-from models import UserSettings, UserResult, UserSessions, UserSessionsInfo
+from models import UserSettings, UserResult, UserSessions, UserSessionsInfo, ExpPanel
 import csv
 
 # Register your models here.
@@ -65,6 +65,13 @@ class UserSessionAdmin(admin.ModelAdmin):
         return False
 
 
+class ExpPanelAdmin(admin.ModelAdmin):
+    list_display = ('instr', 'feedback_type', 'timer_type', 'time_to_start')
+
+    def has_add_permission(self, request):
+        return False
+
+admin.site.register(ExpPanel, ExpPanelAdmin)
 admin.site.register(UserSessionsInfo, UserSessionsInfoAdmin)
 admin.site.register(UserSessions, UserSessionAdmin)
 admin.site.register(UserResult, UserResultAdmin)

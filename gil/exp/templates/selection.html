@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Selection session</title>
+
+    {% load staticfiles %}
+    <link rel="stylesheet" type="text/css" href="{% static 'exp/selection_style.css' %}" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+
+    <!-- jQuery library -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script type="text/javascript" src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+    <script type="text/javascript" src="http://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="/static/exp/cookie.js"></script>
+    <script type="text/javascript" src="/static/exp/gil.js"></script>
+    <script type="text/javascript" src="/static/exp/selection.js"></script>
+
+</head>
+<body>
+    <div class="top_description" style="text-align: center">
+    {% if selection_mode == 'I.TB' %}
+        <font size="4">{{ top_description }}</font>
+    {% endif %}
+
+    {% if selection_mode == 'II.TB' or selection_mode == 'III.TB' %}
+        <font size="4">{{ top_description }}</font><br><br>
+        <font size="4"><strong>{{ rule }}</strong></font>
+    {% endif %}
+    </div>
+
+    <div id="line" style="width: 100%; height: 100px; border-bottom: 1px solid black; text-align: center"></div>
+
+    <br><br>
+    {% if selection_mode == 'I.TB' %}
+        <script>selectionMode = 'I.TB';</script>
+        <div style="text-align: center;">
+            <font size="4"><strong>{{ rule }}</strong></font><br><br>
+            <font size="4">{{ bottom_description }}</font>
+        </div>
+    {% endif %}
+
+    {% if selection_mode == 'II.TB' %}
+        <script>selectionMode = 'II.TB';</script>
+        <div style="text-align: center;">
+            <font size="4"><strong>{{ rule }}</strong></font>
+        </div>
+    {% endif %}
+
+    {% if selection_mode == 'III.TB' %}
+        <script>selectionMode = 'III.TB';</script>
+        <div style="text-align: center;">
+            <font size="4"><strong>{{ rule }}</strong></font>
+        </div>
+    {% endif %}
+
+    <button id="card1" class="card" style="margin-left: 15%; margin-top: 30px; background-color: lightgray;">{{ card_0 }}</button>
+    <button id="card2" class="card" style="background-color: lightgray;">{{ card_1 }}</button>
+    <button id="card3" class="card" style="background-color: lightgray;">{{ card_2 }}</button>
+    <button id="card4" class="card" style="background-color: lightgray;">{{ card_3 }}</button>
+
+    <br><br>
+    <div style="text-align: center;">
+        <font size="4">{{ card_choice_description }}</font>
+    </div>
+
+    {% if session_type == 'Survey Selection' %}
+        <button id='dalej_button' style="position: absolute; right: 20px; bottom: 20px;
+                      width: 105px; font-size: 15px; background-color: aqua">Dalej</button>
+    {% endif %}
+
+    <script>
+        pause = {{ pause }};
+        {% if task_number %}
+            taskNumber = {{ task_number }};
+        {% endif %}
+
+        {% if tasks_count %}
+            tasksCount = {{ tasks_count }};
+        {% endif %}
+
+        {% if cards_order %}
+            cardsOrder = {{ cards_order }};
+        {% endif %}
+
+        {% if session_type == 'Training GIL' %}
+            sessionType = 'Training GIL';
+        {% endif %}
+
+        {% if session_type == 'Survey GIL' %}
+            sessionType = 'Survey GIL';
+        {% endif %}
+
+        {% if session_type == 'Training Selection' %}
+            sessionType = 'Training Selection';
+        {% endif %}
+
+        {% if session_type == 'Survey Selection' %}
+            sessionType = 'Survey Selection';
+        {% endif %}
+
+        $('#dalej_button').click(function (e) {
+            {% if session_type == 'Survey Selection' %}
+                var data = prepareSelectionResults();
+                stopTimer();
+                saveSelectionResults(data);
+            {% endif %}
+        });
+
+        $(document).ready(function () {
+            var sessionTime = 0;
+            {% if session_type == 'Training Selection' %}
+                sessionTime = {{ training_selection_session_time }};
+            {% endif %}
+
+            {% if session_type == 'Survey Selection' %}
+                sessionTime = {{ survey_selection_session_time }};
+            {% endif %}
+
+            sessionStartTime = new Date().getTime();
+            setClickSettings();
+            if (selectionMode != 'I.TB') {
+                startTimer(sessionTime);
+            }
+        });
+
+    </script>
+</body>
+</html>

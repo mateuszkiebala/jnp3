@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Main menu</title>
+
+    {% load staticfiles %}
+    <link rel="stylesheet" type="text/css" href="{% static 'exp/style.css' %}" />
+    <link rel="stylesheet" type="text/css" href="{% static 'exp/selection_style.css' %}" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
+    <!-- jQuery library -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script type="text/javascript" src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+    <script type="text/javascript" src="http://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
+
+    <!-- Latest compiled JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+</head>
+<body>
+
+    <div class="top_centered_div">
+        <a href="/welcome/" class="btn btn-success" style="width: 100%">Eksperyment</a> <br> <br>
+        <a href="/accounts/login_pilot_mode/" class="btn btn-success" style="width: 100%">Tryb pilotażowy</a> <br> <br>
+        <a href="/admin/" class="btn btn-success" style="width: 100%">Panel eksperymentatora</a>
+    </div>
+
+
+</body>
+</html>

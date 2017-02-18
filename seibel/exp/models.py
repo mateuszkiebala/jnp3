@@ -102,3 +102,20 @@ class UserSessionsInfo(models.Model):
     def __iter__(self):
         for attr, value in self.__dict__.iteritems():
             yield attr, value
+
+
+class ExpPanel(models.Model):
+    instr = models.TextField()
+    time_to_start = models.IntegerField(default=5000)
+
+    FEEDBACK_TYPE_CHOICES = (
+        ('Non_feedback', 'Non_feedback'),
+        ('Feedback', 'Feedback'),
+    )
+    feedback_type = models.CharField(default=FEEDBACK_TYPE_CHOICES[0], max_length=100, choices=FEEDBACK_TYPE_CHOICES)
+
+    TIMER_CHOICES = (
+        ('Timeless', 'Timeless'),
+        ('Time_limited', 'Time_limited'),
+    )
+    timer_type = models.CharField(default=TIMER_CHOICES[0], max_length=100, choices=TIMER_CHOICES)

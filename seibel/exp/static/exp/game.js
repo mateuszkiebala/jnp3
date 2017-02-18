@@ -11,18 +11,18 @@ function startTimer(countdownFlag) {
     initializeClock('clockdiv', starttime);
 
     function initializeClock(id, starttime) {
-        var clock = document.getElementById(id);
-        var milisecsSpan = clock.querySelector('.miliseconds');
-        var secondsSpan = clock.querySelector('.seconds');
+        //var clock = document.getElementById(id);
+        //var milisecsSpan = clock.querySelector('.miliseconds');
+        //var secondsSpan = clock.querySelector('.seconds');
 
         function updateClock() {
             var t = getTimeRemaining(starttime, countdownFlag);
-            milisecsSpan.innerHTML = ('0' + t.miliseconds).slice(-2);
-            secondsSpan.innerHTML = ('0' + t.seconds).slice(-2);
+            //milisecsSpan.innerHTML = ('0' + t.miliseconds).slice(-2);
+            //secondsSpan.innerHTML = ('0' + t.seconds).slice(-2);
 
             if (t.total <= 0) {
-                milisecsSpan.innerHTML = '00';
-                secondsSpan.innerHTML = '00';
+                //milisecsSpan.innerHTML = '00';
+                //secondsSpan.innerHTML = '00';
                 stopTimer(countdownFlag);
             }
         }
@@ -173,7 +173,7 @@ function createConfigurations() {
 
 function manageConfigurations() {
     if (curConfsIndex < confsNumber) {
-        updateProgressBar();
+        // updateProgressBar();
         clearBulbs();
         displayConfiguration(confs[curConfsIndex]);
         ++curConfsIndex;

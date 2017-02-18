@@ -1,5 +1,5 @@
 from django.shortcuts import render, render_to_response
-from exp.models import UserSettings, UserResult, UserSessions, UserSessionsInfo
+from exp.models import UserSettings, UserResult, UserSessions, UserSessionsInfo, ExpPanel
 from django.views.decorators.csrf import csrf_protect
 from django.contrib.auth.decorators import login_required
 from rest_framework.decorators import api_view
@@ -30,6 +30,9 @@ def play(request):
                                                                           session_number=latest_session_no,
                                                                           feedback_type=user_settings.feedback_type,
                                                                           timer_type=user_settings.timer_type)]
+
+        exp_panel = ExpPanel.objects.filter(feedback_type=user_settings.feedback_type,
+                                            timer_type=user_settings.timer_type)
         return render(request, 'game.html',
                         {'game_type': 'Normal',
                          'session_limit': user_settings.session_limit,
@@ -38,7 +41,9 @@ def play(request):
                          'time_gap': user_settings.time_gap,
                          'session_number': latest_session_no,
                          'training_done': user_session.training_done,
-                         'confs_done': confs_done })
+                         'confs_done': confs_done,
+                         'instr': exp_panel[0].instr,
+                         'time_to_start': exp_panel[0].time_to_start})
     else:
         return render(request, 'no_settings.html')
 

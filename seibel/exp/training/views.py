@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from exp.models import UserSessions, UserSettings
+from exp.models import UserSessions, UserSettings, ExpPanel
 from django.views.decorators.csrf import csrf_protect
 from django.contrib.auth.decorators import login_required
 from rest_framework.decorators import api_view
@@ -10,11 +10,15 @@ def training(request):
     settings_set = UserSettings.objects.filter(user=request.user)
     if settings_set.__len__() > 0:
         user_settings = settings_set[0]
+        exp_panel = ExpPanel.objects.filter(feedback_type=user_settings.feedback_type,
+                                            timer_type=user_settings.timer_type)
         return render(request, 'game.html',
                       {'game_type': 'Training',
                        'feedback_type': user_settings.feedback_type,
                        'timer_type': user_settings.timer_type,
-                       'time_gap': user_settings.time_gap
+                       'time_gap': user_settings.time_gap,
+                       'instr': exp_panel[0].instr,
+                       'time_to_start': exp_panel[0].time_to_start
                        })
     else:
         return render(request, 'no_settings.html')

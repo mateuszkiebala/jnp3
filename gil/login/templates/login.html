@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Welcome</title>
+
+    {% load staticfiles %}
+    <link rel="stylesheet" type="text/css" href="{% static 'exp/style.css' %}" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
+    <!-- jQuery library -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script type="text/javascript" src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+    <script type="text/javascript" src="http://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
+
+    <!-- Latest compiled JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+</head>
+
+<body>
+    <div class="container">
+        <div class="card card-container">
+            {% block content %}
+                {% if form.errors %}
+                    <p class="error"> {{ form.errors }}</p>
+                {% endif %}
+
+                <form method="post"
+                        {% if mode == 'experiment' %}
+                            action="/accounts/login_experiment/"
+                        {% endif %}
+
+                        {% if mode == 'pilot_mode' %}
+                            action="/accounts/login_pilot_mode/"
+                        {% endif %} >{% csrf_token %}
+                    <label class="control-label" for="username">Username</label> {{ form.username }}<br><br>
+                    <label class="control-label" for="age">Age</label> {{ form.age }}<br><br>
+                    <label class="control-label" for="gender">Gender</label> {{ form.gender }}<br>
+                    <button class="right-corner-btn btn btn-success" type="submit">Dalej</button>
+                </form>
+            {% endblock %}
+        </div>
+    </div>
+
+</body>
+</html>

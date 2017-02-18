@@ -1,0 +1,59 @@
+.right-corner-btn {
+    position: absolute;
+    bottom: 50px;
+    right: 50px;
+    width: 105px;
+}
+
+.btn {
+    font-weight: 700;
+    height: 36px;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    user-select: none;
+    cursor: default;
+}
+
+.line-center{
+    margin:0;padding:0 10px;
+    background:#fff;
+    display:inline-block;
+}
+
+h2{
+
+    text-align:center;
+    position:relative;
+    z-index:2;
+
+}
+h2:after{
+    content:"";
+    position:absolute;
+    top:50%;
+    left:0;
+    right:0;
+    border-top:solid 1px red;
+    z-index:-1;
+}
+
+.card {
+    width: 17%;
+    height: 100px;
+    margin: 10px;
+}
+
+.top_centered_div {
+    position: absolute;
+    top: 40%;
+    left: 45%;
+    width: 200px;
+}​
+
+.top_description {
+    position: absolute;
+    top: 10%;
+    left: 15%;
+    width: 70%;
+}​
+

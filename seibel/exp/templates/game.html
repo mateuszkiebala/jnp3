@@ -25,6 +25,7 @@
     <script type="text/javascript" src="/static/exp/game.js"></script>
 </head>
 <body>
+
     <div class="container">
         <!-- Instructions Modal -->
         <div class="modal fade" id="myModal" role="dialog">
@@ -37,6 +38,8 @@
                     <h4 id="modal-header-title" class="modal-title"></h4>
                 </div>
             <div class="modal-body">
+                <h5>{{ instr }}</h5>
+                <!--
                 <h5>Gdy zapali się żarówka, naciśnij odpowiadający jej klawisz na klawiaturze.</h5>
                 {% if feedback_type == 'Feedback' %}
                     <h5>Gdy naciśniesz nieprawidłowy przycisk, usłyszysz sygnał dźwiękowy.</h5>
@@ -59,7 +62,7 @@
                 <h5>Wciśnij <strong>spację</strong>, aby przerwać eksperyment.</h5>
                 <br>
                 <h5>Po naciśnięciu przycisku "Close" masz 5 sekund zanim zaczniesz eksperyment.</h5>
-
+                -->
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal" onclick="modalCloseBtn()">Close</button>
@@ -197,6 +200,7 @@
         </div>
     </div>
 
+    <!--
     <h3>Time</h3>
     <div id="clockdiv">
         <div>
@@ -209,6 +213,7 @@
         </div>
     </div>
 
+
     <br><br>
     <div class="progress center">
         <div id="progress_bar" class="progress-bar progress-bar-striped active" role="progressbar"
@@ -216,6 +221,7 @@
             <span><strong>Progress</strong></span>
         </div>
     </div>
+    -->
 
     {% if game_type == 'Training' %}
         <form action="/accounts/loggedin">
