@@ -1,2 +1,2 @@
-user,task_id
-admin,2
+user,task_id,cards_order,correctness,correct_cards,doing_task_time,solving_task_time,card_P_clicks,card_nP_clicks,card_Q_clicks,card_nQ_clicks,card_P_final,card_nP_final,card_Q_final,card_nQ_final,chosen_cards
+rtrt,2,"['nQ', 'nP', 'P', 'Q']",True,[Q],1963,921,[],[],[427],[],0,0,427,0,['Q']

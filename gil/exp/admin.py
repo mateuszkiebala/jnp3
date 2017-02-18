@@ -86,7 +86,9 @@ class PilotModeSettingsAdmin(admin.ModelAdmin):
 
 
 class PilotModeResultsAdmin(SelectionResultsAdmin):
-    pass
+    def _export_to_csv(self, request, queryset):
+        export_to_csv(self, request, queryset, 'pilot_mode_results.csv')
+    _export_to_csv.short_description = "Export pilot mode results to CSV file."
 
 
 admin.site.register(Tasks, TasksAdmin)

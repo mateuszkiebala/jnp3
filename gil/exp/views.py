@@ -152,6 +152,12 @@ def shuffle_cards():
     return s
 
 
+def convert_time(time):
+    s = str(time / 1000)
+    ms = str(time % 1000)
+    return s + ' s ' + ms + ' ms'
+
+
 def get_training_tasks():
     ss = SessionSettings.objects.all()
     if ss.count() > 0:
@@ -229,8 +235,8 @@ def selection_save_task(request):
 
             SelectionResults.objects.filter(user=request.user,
                                             task_id=task_id).\
-                                            update(doing_task_time=doing_task_time,
-                                                   solving_task_time=solving_task_time,
+                                            update(doing_task_time=convert_time(doing_task_time),
+                                                   solving_task_time=convert_time(solving_task_time),
                                                    cards_order = cards_order_names,
                                                    correctness=correctness,
                                                    correct_cards=task.correct_answers,
@@ -330,8 +336,8 @@ def save_pilot_mode_task(request):
 
             PilotModeResults.objects.filter(user=request.user,
                                             task_id=task_id).\
-                                            update(doing_task_time=doing_task_time,
-                                                   solving_task_time=solving_task_time,
+                                            update(doing_task_time=convert_time(doing_task_time),
+                                                   solving_task_time=convert_time(solving_task_time),
                                                    cards_order = cards_order_names,
                                                    correctness=correctness,
                                                    correct_cards=task.correct_answers,
