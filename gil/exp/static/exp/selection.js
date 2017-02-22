@@ -79,10 +79,10 @@ function prepareSelectionResults() {
     data['card_1_clicks'] = [sessionStartTime].concat(card1Clicks);
     data['card_2_clicks'] = [sessionStartTime].concat(card2Clicks);
     data['card_3_clicks'] = [sessionStartTime].concat(card3Clicks);
-    data['card_0_final'] = Math.max(cardLastSelection[0] - sessionStartTime, 0);
-    data['card_1_final'] = Math.max(cardLastSelection[1] - sessionStartTime, 0);
-    data['card_2_final'] = Math.max(cardLastSelection[2] - sessionStartTime, 0);
-    data['card_3_final'] = Math.max(cardLastSelection[3] - sessionStartTime, 0);
+    data['card_0_final'] = cardClicked[0] ? cardLastSelection[0] - sessionStartTime : 0;
+    data['card_1_final'] = cardClicked[1] ? cardLastSelection[1] - sessionStartTime : 0;
+    data['card_2_final'] = cardClicked[2] ? cardLastSelection[2] - sessionStartTime : 0;
+    data['card_3_final'] = cardClicked[3] ? cardLastSelection[3] - sessionStartTime : 0;
     data['cards_order'] = cardsOrder;
 
     var c = [];

@@ -36,7 +36,7 @@ function isLeftClick(e) {
 
 $(document).mousedown (function (e) {
     // validClick is set to false in selection.js, button click is always earlier noticed then document
-    if (isRightClick(e) && validClick) {
+    if (isRightClick(e) && validClick && sessionType != 'Pilot Mode') {
         clicks.push(new Date().getTime());
         if (selectionMode == 'III.TB') {
             checkRythm();

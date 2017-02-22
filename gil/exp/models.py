@@ -10,8 +10,11 @@ class SessionSettings(models.Model):
     training_gil_session_time = models.PositiveIntegerField(default=0)
     survey_gil_session_time = models.PositiveIntegerField(default=0)
     training_selection_session_time = models.PositiveIntegerField(default=0)
-    survey_selection_session_time = models.PositiveIntegerField(default=0)
     training_tasks = models.TextField(default=[])
+
+    def clean(self):
+        if self._state.adding and DescriptionSettings.objects.all().exists():
+            raise ValidationError('Settings already exists.')
 
 
 class Tasks(models.Model):
@@ -29,6 +32,7 @@ class Tasks(models.Model):
 
 class SelectionResults(models.Model):
     user = models.ForeignKey(User)
+    external_task_number = models.PositiveIntegerField(default=1)
     task_id = models.PositiveIntegerField()
     cards_order = models.TextField(default=[])
     correctness = models.CharField(default="-", max_length=20)
@@ -91,9 +95,14 @@ class PilotModeSettings(models.Model):
     welcome_description = models.TextField()
     training_tasks = models.TextField(default=[])
 
+    def clean(self):
+        if self._state.adding and DescriptionSettings.objects.all().exists():
+            raise ValidationError('Settings already exists.')
+
 
 class PilotModeResults(models.Model):
     user = models.ForeignKey(User)
+    external_task_number = models.PositiveIntegerField(default=1)
     task_id = models.PositiveIntegerField()
     cards_order = models.TextField(default=[])
     correctness = models.CharField(default="-", max_length=20)

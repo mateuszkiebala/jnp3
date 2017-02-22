@@ -26,7 +26,8 @@
 
     {% if selection_mode == 'II.TB' or selection_mode == 'III.TB' %}
         <font size="4">{{ top_description }}</font><br><br>
-        <font size="4"><strong>{{ rule }}</strong></font>
+        <font size="4"><strong>{{ rule }}</strong></font><br><br>
+        <font size="4">{{ bottom_description }}</font>
     {% endif %}
     </div>
 
@@ -70,6 +71,10 @@
                       width: 105px; font-size: 15px; background-color: aqua">Dalej</button>
     {% endif %}
 
+    {% if session_type == 'Survey Selection' %}
+        <footer style="position: absolute; text-align: center; bottom: 20px;"> Naciśnij odpowiednie przyciski reprezentujące karty. Klikając przycisk powtórnie możesz cofnąć wybór. </footer>
+    {% endif %}
+
     <script>
         pause = {{ pause }};
         {% if task_number %}
@@ -103,7 +108,9 @@
         $('#dalej_button').click(function (e) {
             {% if session_type == 'Survey Selection' %}
                 var data = prepareSelectionResults();
-                stopTimer();
+                {% if selection_mode != 'I.TB' %}
+                    stopTimer();
+                {% endif %}
                 saveSelectionResults(data);
             {% endif %}
         });
@@ -112,10 +119,6 @@
             var sessionTime = 0;
             {% if session_type == 'Training Selection' %}
                 sessionTime = {{ training_selection_session_time }};
-            {% endif %}
-
-            {% if session_type == 'Survey Selection' %}
-                sessionTime = {{ survey_selection_session_time }};
             {% endif %}
 
             sessionStartTime = new Date().getTime();

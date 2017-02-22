@@ -22,7 +22,6 @@ class SessionSettingsAdmin(admin.ModelAdmin):
     list_display = ('pause', 'training_gil_session_time',
                     'survey_gil_session_time',
                     'training_selection_session_time',
-                    'survey_selection_session_time',
                     'training_tasks')
 
 
@@ -41,6 +40,7 @@ class GilResultsAdmin(admin.ModelAdmin):
 
 class SelectionResultsAdmin(admin.ModelAdmin):
     list_display = ('user',
+                    'external_task_number',
                     'task_id',
                     'cards_order',
                     'correctness',

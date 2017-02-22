@@ -53,13 +53,12 @@ def login_pilot_mode(request):
         data['password2'] = password
         form = RegistrationForm(data)
         if form.is_valid():
-            selection_mode = get_selection_mode()
             user = form.save()
             UserProfile(user=user,
                         name=form.cleaned_data['username'],
                         age=form.cleaned_data['age'],
                         gender=form.cleaned_data['gender'],
-                        selection_mode=selection_mode).save()
+                        selection_mode='-').save()
             username = data.get('username', '')
             user = auth.authenticate(username=username, password=password)
             if user is not None:
@@ -78,7 +77,10 @@ ADMINS = 1
 
 
 def get_selection_mode():
-    cnt = User.objects.all().count()
+    selection_users_cnt = UserProfile.objects.all().count()
+    pilot_mode_users_cnt = UserProfile.objects.filter(selection_mode='-').count()
+    cnt = selection_users_cnt - pilot_mode_users_cnt
+    selection_mode = '-'
     if ((cnt - ADMINS) % MODES) == 0:
         selection_mode = 'I.TB'
     elif ((cnt - ADMINS) % MODES) == 1:

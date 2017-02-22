@@ -111,7 +111,6 @@ def survey_selection(request):
     args = get_task_args(request.user)
     settings = SessionSettings.objects.all()[0]
     args['task_number'], task_number = get_next_task(request.user)
-    args['survey_selection_session_time'] = settings.survey_selection_session_time
     args['pause'] = settings.pause
     args['tasks_count'] = Tasks.objects.all().count()
     args['session_type'] = 'Survey Selection'
@@ -235,7 +234,8 @@ def selection_save_task(request):
 
             SelectionResults.objects.filter(user=request.user,
                                             task_id=task_id).\
-                                            update(doing_task_time=convert_time(doing_task_time),
+                                            update(external_task_number=task_done,
+                                                   doing_task_time=convert_time(doing_task_time),
                                                    solving_task_time=convert_time(solving_task_time),
                                                    cards_order = cards_order_names,
                                                    correctness=correctness,
@@ -336,7 +336,8 @@ def save_pilot_mode_task(request):
 
             PilotModeResults.objects.filter(user=request.user,
                                             task_id=task_id).\
-                                            update(doing_task_time=convert_time(doing_task_time),
+                                            update(external_task_number=task_done,
+                                                   doing_task_time=convert_time(doing_task_time),
                                                    solving_task_time=convert_time(solving_task_time),
                                                    cards_order = cards_order_names,
                                                    correctness=correctness,
